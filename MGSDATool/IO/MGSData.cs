@@ -14,7 +14,7 @@ namespace MGSDATool.IO
     /// </summary>
     class MGSData
     {
-        const string Padding = "PADDING";
+        const string Padding = "FON";
         const string TextSeparator = "\r\n------\r\n";
 
         public delegate void StatusChanged(float Percentage);
@@ -277,7 +277,7 @@ namespace MGSDATool.IO
                         }
 
                         int PadIndex = 0;
-                        while ((TextBlock.Position & 7) != 0)
+                        while ((TextBlock.Position & 3) != 0)
                         {
                             byte Encrypted = Crypto.ProcessByte((byte)Padding[PadIndex++]);
                             TextBlock.WriteByte(Encrypted);
