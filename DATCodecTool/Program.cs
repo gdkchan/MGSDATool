@@ -1,17 +1,19 @@
 ﻿using System;
 
-using MGSDATool.IO;
+using DATCodecTool.IO;
 
-namespace MGSDATool
+using MGSShared;
+
+namespace DATCodecTool
 {
     class Program
     {
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("MGSDATool by gdkchan");
+            Console.WriteLine("DATCodecTool by gdkchan");
             Console.WriteLine("MGS codec.dat text extractor/creator");
-            Console.WriteLine("Version 0.1.1");
+            Console.WriteLine("Version 0.1.2");
             Console.ResetColor();
             Console.Write(Environment.NewLine);
 

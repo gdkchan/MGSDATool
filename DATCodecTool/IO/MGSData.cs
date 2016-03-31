@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 
-using MGSDATool.IO.Security;
-using MGSDATool.Properties;
+using DATCodecTool.IO.Security;
 
-namespace MGSDATool.IO
+using MGSShared;
+
+namespace DATCodecTool.IO
 {
     /// <summary>
     ///     Metal Gear Solid DAT extraction/creation.
@@ -19,8 +19,6 @@ namespace MGSDATool.IO
 
         public delegate void StatusChanged(float Percentage);
         public static event StatusChanged OnStatusChanged;
-
-        private static string[] Table;
 
         /// <summary>
         ///     Extracts the texts and other data inside the codec.dat file from MGS.
@@ -42,7 +40,7 @@ namespace MGSDATool.IO
         /// <param name="OutputFolder">The output folder where the extracted data will be placed</param>
         public static void Extract(Stream Data, string OutputFolder, MGSGame Game)
         {
-            if (Game == MGSGame.MGS3) Table = GetTable();
+            if (Game == MGSGame.MGS3) MGSText.Initialize();
             BinaryReader Reader = new BinaryReader(Data);
 
             List<uint> AddressTable = new List<uint>();
@@ -74,7 +72,7 @@ namespace MGSDATool.IO
                 uint ScriptHeaderOffset = Reader.ReadUInt32() + BaseOffset;
                 uint Key = Reader.ReadUInt32();
 
-                //Read header (with Script pointers)
+                //Read header (with script pointers)
                 Data.Seek(AddressTable[Index], SeekOrigin.Begin);
                 byte[] Header = new byte[HeaderLength];
                 Reader.Read(Header, 0, Header.Length);
@@ -82,7 +80,7 @@ namespace MGSDATool.IO
                 MGSCrypto Crypto = new MGSCrypto(Key);
                 StringBuilder Text = new StringBuilder();
 
-                //Load texts
+                //Read texts
                 if (DialogsTableOffset != DialogsTextOffset)
                 {
                     int TextIndex = 0;
@@ -103,7 +101,7 @@ namespace MGSDATool.IO
                         Reader.Read(TextBuffer, 0, TextBuffer.Length);
                         TextBuffer = UnpadText(Crypto.ProcessBuffer(TextBuffer));
 
-                        Text.Append(Buffer2Text(TextBuffer, Game));
+                        Text.Append(MGSText.Buffer2Text(TextBuffer, Game));
                         Text.Append(TextSeparator);
                     }
                 }
@@ -121,7 +119,7 @@ namespace MGSDATool.IO
                     File.WriteAllBytes(ScriptHeaderFile, ScriptHeader);
                 }
 
-                //Load script
+                //Read script
                 Data.Seek(ScriptOffset, SeekOrigin.Begin);
                 uint ScriptLength = AddressTable[Index + 1] - ScriptOffset;
                 byte[] Script = new byte[ScriptLength];
@@ -141,52 +139,6 @@ namespace MGSDATool.IO
                     OnStatusChanged(Percentage);
                 }
             }
-        }
-
-        private static string Buffer2Text(byte[] Data, MGSGame Game)
-        {
-            switch (Game)
-            {
-                case MGSGame.MGS3:
-                    StringBuilder Output = new StringBuilder();
-
-                    for (int Index = 0; Index < Data.Length; Index++)
-                    {
-                        if (Data[Index] < 0x20 || Data[Index] > 0x7e)
-                        {
-                            if (Data[Index] == 0xa)
-                                Output.Append(Environment.NewLine);
-                            else if (Data[Index] == 0)
-                                Output.Append("[end]");
-                            else
-                            {
-                                int Value = (Data[Index] << 8) | Data[++Index];
-
-                                if (Table[Value] == null)
-                                    Output.Append("\\x" + Value.ToString("X4"));
-                                else
-                                    Output.Append(Table[Value]);
-                            }
-                        }
-                        else
-                            Output.Append((char)Data[Index]);
-                    }
-
-                    return Output.ToString();
-
-                case MGSGame.MGS4: return MGS2Text(Encoding.UTF8.GetString(Data));
-            }
-
-            return null;
-        }
-
-        private static string MGS2Text(string Text)
-        {
-            //Make text editable with notepad
-            Text = Text.Replace(((char)0xa).ToString(), Environment.NewLine);
-            Text = Text.Replace(((char)0).ToString(), "[end]");
-
-            return Text;
         }
 
         private static byte[] UnpadText(byte[] Data)
@@ -223,7 +175,7 @@ namespace MGSDATool.IO
         /// <param name="InputFolder">The input folder with the extracted data</param>
         public static void Create(Stream Data, string InputFolder, MGSGame Game)
         {
-            if (Game == MGSGame.MGS3) Table = GetTable();
+            if (Game == MGSGame.MGS3) MGSText.Initialize();
             BinaryWriter Writer = new BinaryWriter(Data);
 
             string[] Folders = Directory.GetDirectories(InputFolder);
@@ -271,7 +223,7 @@ namespace MGSDATool.IO
                             TextWriter.Write((uint)(TextOffset | 0x80000000));
 
                             TextBlock.Seek(BaseTextOffset + TextOffset, SeekOrigin.Begin);
-                            byte[] Buffer = Text2Buffer(Texts[Index], Game);
+                            byte[] Buffer = MGSText.Text2Buffer(Texts[Index], Game);
                             TextWriter.Write(Crypto.ProcessBuffer(Buffer));
                             TextOffset += Buffer.Length;
                         }
@@ -308,79 +260,6 @@ namespace MGSDATool.IO
                     OnStatusChanged(Percentage);
                 }
             }
-        }
-
-        private static byte[] Text2Buffer(string Text, MGSGame Game)
-        {
-            switch (Game)
-            {
-                case MGSGame.MGS3:
-                    Text = Text2MGS(Text);
-
-                    using (MemoryStream Output = new MemoryStream())
-                    {
-                        for (int Index = 0; Index < Text.Length; Index++)
-                        {
-                            if (Index < Text.Length - 1 && Text.Substring(Index, 2) == "\\x")
-                            {
-                                string Hex = Text.Substring(Index + 2, 4);
-                                ushort Value = ushort.Parse(Hex, NumberStyles.HexNumber);
-                                Output.WriteByte((byte)(Value >> 8));
-                                Output.WriteByte((byte)Value);
-                                Index += 5;
-                            }
-                            else
-                            {
-                                bool InRange = Text[Index] < 0x20 || Text[Index] > 0x7e;
-                                if (InRange && Text[Index] != 0 && Text[Index] != 0xa)
-                                {
-                                    int Value = Array.IndexOf(Table, Text.Substring(Index, 1));
-
-                                    if (Value > -1)
-                                    {
-                                        Output.WriteByte((byte)(Value >> 8));
-                                        Output.WriteByte((byte)Value);
-                                    }
-                                }
-                                else
-                                    Output.WriteByte((byte)Text[Index]);
-                            }
-                        }
-
-                        return Output.ToArray();
-                    }
-
-                case MGSGame.MGS4: return Encoding.UTF8.GetBytes(Text2MGS(Text));
-            }
-
-            return null;
-        }
-
-        private static string Text2MGS(string Text)
-        {
-            //Undo the changes made by MGS2Text
-            Text = Text.Replace(Environment.NewLine, ((char)0xa).ToString());
-            Text = Text.Replace("[end]", ((char)0).ToString());
-
-            return Text;
-        }
-
-        private static string[] GetTable()
-        {
-            string[] Table = new string[0x10000];
-            string[] LineBreaks = new string[] { "\n", "\r\n" };
-            string[] TableElements = Resources.CharacterTable.Split(LineBreaks, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string Element in TableElements)
-            {
-                int Position = Element.IndexOf("=");
-                int Value = Convert.ToInt32(Element.Substring(0, Position), 16);
-                string Character = Element.Substring(Position + 1, Element.Length - Position - 1);
-
-                Table[Value] = Character;
-            }
-
-            return Table;
         }
     }
 }

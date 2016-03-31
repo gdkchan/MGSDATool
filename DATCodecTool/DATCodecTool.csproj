@@ -7,8 +7,8 @@
     <ProjectGuid>{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MGSDATool</RootNamespace>
-    <AssemblyName>MGSDATool</AssemblyName>
+    <RootNamespace>DATCodecTool</RootNamespace>
+    <AssemblyName>DATCodecTool</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IO\MGSGame.cs" />
     <Compile Include="IO\MGSData.cs" />
     <Compile Include="IO\Security\MGSCrypto.cs" />
     <Compile Include="Program.cs" />
@@ -64,9 +63,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\CharacterTable.txt" />
-  </ItemGroup>
+  <Import Project="..\MGSShared\MGSShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

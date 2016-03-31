@@ -3,9 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MGSDATool", "MGSDATool\MGSDATool.csproj", "{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DATCodecTool", "DATCodecTool\DATCodecTool.csproj", "{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DATMovieTool", "DATMovieTool\DATMovieTool.csproj", "{2ECDAEB8-825C-43C1-91C3-4F50C471F44A}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "MGSShared", "MGSShared\MGSShared.shproj", "{AA23049D-C099-44FE-8ABD-5DFAE0385423}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DATSpeechTool", "DATSpeechTool\DATSpeechTool.csproj", "{21193AF6-AEFF-469F-92E3-67791C886902}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		MGSShared\MGSShared.projitems*{ae6b00ab-f647-4630-93b4-bb63bf7ceaa4}*SharedItemsImports = 4
+		MGSShared\MGSShared.projitems*{2ecdaeb8-825c-43c1-91c3-4f50c471f44a}*SharedItemsImports = 4
+		MGSShared\MGSShared.projitems*{21193af6-aeff-469f-92e3-67791c886902}*SharedItemsImports = 4
+		MGSShared\MGSShared.projitems*{aa23049d-c099-44fe-8abd-5dfae0385423}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,6 +27,14 @@ Global
 		{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE6B00AB-F647-4630-93B4-BB63BF7CEAA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ECDAEB8-825C-43C1-91C3-4F50C471F44A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ECDAEB8-825C-43C1-91C3-4F50C471F44A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ECDAEB8-825C-43C1-91C3-4F50C471F44A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ECDAEB8-825C-43C1-91C3-4F50C471F44A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21193AF6-AEFF-469F-92E3-67791C886902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21193AF6-AEFF-469F-92E3-67791C886902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21193AF6-AEFF-469F-92E3-67791C886902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21193AF6-AEFF-469F-92E3-67791C886902}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

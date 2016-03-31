@@ -1,4 +1,4 @@
-﻿namespace MGSDATool.IO.Security
+﻿namespace DATCodecTool.IO.Security
 {
     /// <summary>
     ///     Metal Gear Solid DAT encryption.

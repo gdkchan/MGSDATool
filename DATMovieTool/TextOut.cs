@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MGSDATool
+namespace DATMovieTool
 {
     class TextOut
     {
