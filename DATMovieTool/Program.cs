@@ -19,7 +19,7 @@ namespace DATMovieTool
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("DATMovieTool by gdkchan");
             Console.WriteLine("MGS movie.dat subtitle extractor/inserter");
-            Console.WriteLine("Version 0.1.3");
+            Console.WriteLine("Version 0.1.5");
             Console.ResetColor();
             Console.Write(Environment.NewLine);
 
@@ -33,6 +33,7 @@ namespace DATMovieTool
                 MGSGame Game;
                 switch (args[1])
                 {
+                    case "-mgsts": Game = MGSGame.MGSTS; break;
                     case "-mgs3": Game = MGSGame.MGS3; break;
                     case "-mgs4": Game = MGSGame.MGS4; break;
                     default: TextOut.PrintError("Invalid game \"" + args[1] + "\" specified!"); return;
@@ -63,10 +64,8 @@ namespace DATMovieTool
             Console.WriteLine("Examples:");
             Console.Write(Environment.NewLine);
 
-            Console.WriteLine("tool -e -mgs4 movie.dat folder  Extracts subtitles from a MGS4 movie.dat file");
-            Console.WriteLine("tool -i -mgs4 movie.dat folder  Creates the MGS4 movie.dat from a folder");
-            Console.WriteLine("tool -e -mgs3 movie.dat folder  Extracts subtitles from a MGS3 movie.dat file");
-            Console.WriteLine("tool -i -mgs3 movie.dat folder  Creates the MGS3 movie.dat from a folder");
+            Console.WriteLine("tool -e -mgs<3|4|ts> movie.dat folder  Extracts subtitles from a movie.dat file");
+            Console.WriteLine("tool -i -mgs<3|4|ts> movie.dat folder  Creates the movie.dat from a folder");
         }
 
         public class MovieSubtitle
@@ -98,6 +97,10 @@ namespace DATMovieTool
 
                 switch (Game)
                 {
+                    case MGSGame.MGSTS:
+                        Reader = new EndianBinaryReader(Input, Endian.Big);
+                        Game = MGSGame.MGS3;
+                        break;
                     case MGSGame.MGS3: Reader = new EndianBinaryReader(Input, Endian.Little); break;
                     case MGSGame.MGS4: Reader = new EndianBinaryReader(Input, Endian.Big); break;
                 }
@@ -156,6 +159,10 @@ namespace DATMovieTool
             Endian Endian = Endian.Default;
             switch (Game)
             {
+                case MGSGame.MGSTS:
+                    Endian = Endian.Big;
+                    Game = MGSGame.MGS3;
+                    break;
                 case MGSGame.MGS3: Endian = Endian.Little; break;
                 case MGSGame.MGS4: Endian = Endian.Big; break;
             }
